@@ -391,18 +391,57 @@
     </div>
 
     <script>
-        // GitHub配置 - 需要替换为您的实际信息
-        const GITHUB_CONFIG = {
-            // 替换为您的GitHub用户名
-            username: 'YOUR_GITHUB_USERNAME',
-            // 替换为您的仓库名
-            repo: 'YOUR_REPO_NAME',
-            // 替换为存储数据的文件路径
-            dataFile: 'data/nav-data.json',
-            // 替换为您的GitHub个人访问令牌 (需要有repo权限)
-            token: 'YOUR_GITHUB_TOKEN'
+        // 数据存储配置
+        const DATA_CONFIG = {
+            // 使用相对路径直接访问数据文件
+            dataUrl: './data/nav-data.json',
+            // 使用GitHub Actions自动构建，不需要API令牌
+            useDirectAccess: true
         };
 
+        // 默认数据
+        const DEFAULT_DATA = {
+            // ... 保持原有默认数据不变
+        };
+
+        // 从GitHub Pages直接加载数据
+        async function loadDataFromGitHub() {
+            try {
+                const response = await fetch(DATA_CONFIG.dataUrl + '?t=' + Date.now());
+                if (response.ok) {
+                    return await response.json();
+                } else {
+                    throw new Error(`加载数据失败: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('从GitHub加载数据失败:', error);
+                return DEFAULT_DATA;
+            }
+        }
+
+        // 保存数据到GitHub（通过GitHub Actions）
+        async function saveDataToGitHub(data) {
+            // 由于安全限制，在GitHub Pages上无法直接写入
+            // 提示用户手动更新数据文件
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'nav-data.json';
+            a.click();
+            
+            // 显示操作说明
+            showStatus('admin-status', 
+                '数据已生成并下载。请将下载的nav-data.json文件上传到您的GitHub仓库的data文件夹中，然后等待GitHub Pages自动更新。', 
+                'success'
+            );
+            
+            return true;
+        }
+
+        
         // 默认数据（当无法从GitHub加载时使用）
         const DEFAULT_DATA = {
             pageSettings: {
