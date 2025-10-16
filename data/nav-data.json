@@ -1,0 +1,36 @@
+{
+  "pageSettings": {},
+  "categories": [
+    {
+      "id": 1760592801771,
+      "name": "竞品采集模块",
+      "description": ""
+    }
+  ],
+  "links": [
+    {
+      "id": 1760593193538,
+      "categoryId": 1760592801771,
+      "name": "竞品信息采集",
+      "description": "",
+      "url": "https://q02gj5lyidv.feishu.cn/share/base/form/shrcn8NtbZyN8G8IazSO1FTCbWh",
+      "icon": "🪴"
+    },
+    {
+      "id": 1760593260447,
+      "categoryId": 1760592801771,
+      "name": "市场信息采集",
+      "description": "",
+      "url": "https://q02gj5lyidv.feishu.cn/share/base/form/shrcnwBtXoH5P4fpesdG1Bx2Mie",
+      "icon": "🗞️"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "YWRtaW4xMjM=",
+      "permission": 2
+    }
+  ]
+}
