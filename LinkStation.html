@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>竞品信息汇总平台</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #1abc9c;
+            --light-gray: #f5f7fa;
+            --medium-gray: #e1e8ed;
+            --dark-gray: #34495e;
+            --text-color: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--light-gray) 0%, var(--medium-gray) 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 头部样式 */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: var(--shadow);
+        }
+
+        header h1 {
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            color: var(--text-light);
+            font-size: 1.2rem;
+        }
+
+        /* 分类样式 */
+        .category {
+            margin-bottom: 40px;
+        }
+
+        .category-title {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        /* 链接模块样式 */
+        .tiles-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .tile {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .tile-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .tile-title {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .tile-short-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 10px;
+            height: 2.5em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .tile-description {
+            color: var(--text-light);
+            flex-grow: 1;
+            margin-bottom: 15px;
+        }
+
+        .tile-link {
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-top: auto;
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 登录模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-secondary {
+            background: var(--medium-gray);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdb;
+        }
+
+        .btn-success {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a085;
+        }
+
+        .btn-edit {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #e67e22;
+        }
+
+        .btn-cancel {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #c0392b;
+        }
+
+        /* 后台管理样式 */
+        .admin-panel {
+            display: none;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .admin-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--medium-gray);
+            flex-wrap: wrap;
+        }
+
+        .admin-tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .admin-tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .admin-content {
+            display: none;
+        }
+
+        .admin-content.active {
+            display: block;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .status-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .instruction-box {
+            background: #e7f3ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .instruction-box h4 {
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .instruction-box ol {
+            margin-left: 20px;
+        }
+
+        .instruction-box li {
+            margin-bottom: 8px;
+        }
+
+        .github-actions {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--medium-gray);
+        }
+
+        .github-actions .btn {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .tiles-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .admin-tabs {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tiles-container {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .admin-header h2 {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 主页面头部 -->
+        <header>
+            <h1 id="page-title">竞品信息汇总平台</h1>
+            <p id="page-description">选择合适的入口收集信息</p>
+        </header>
+
+        <!-- 加载状态 -->
+        <div id="loading-state" class="loading">
+            <div class="spinner"></div>
+            <p>正在加载数据...</p>
+        </div>
+
+        <!-- 分类和链接展示区 -->
+        <div id="categories-container" style="display: none;">
+            <!-- 分类和链接会通过JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <!-- 登录模态框 -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h2>管理员登录</h2>
+            <div id="login-status"></div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">登录</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 后台管理面板 -->
+    <div id="admin-panel" class="admin-panel">
+        <div class="admin-header">
+            <h2>后台管理</h2>
+            <button id="logout-btn" class="btn btn-secondary">退出</button>
+        </div>
+        
+        <div id="admin-status" class="status-message" style="display: none;"></div>
+        
+        <div class="admin-tabs">
+            <div class="admin-tab active" data-tab="links">链接管理</div>
+            <div class="admin-tab" data-tab="categories">分类管理</div>
+            <div class="admin-tab" data-tab="page-settings">页面设置</div>
+            <div class="admin-tab admin-only" data-tab="users">用户管理</div>
+            <div class="admin-tab" data-tab="github-sync">GitHub同步</div>
+        </div>
+        
+        <div class="admin-content active" id="links-content">
+            <h3>链接管理</h3>
+            <!-- 链接管理内容 -->
+        </div>
+        
+        <div class="admin-content" id="categories-content">
+            <h3>分类管理</h3>
+            <!-- 分类管理内容 -->
+        </div>
+        
+        <div class="admin-content" id="page-settings-content">
+            <h3>页面设置</h3>
+            <!-- 页面设置内容 -->
+        </div>
+        
+        <div class="admin-content" id="users-content">
+            <h3>用户管理</h3>
+            <!-- 用户管理内容 -->
+        </div>
+        
+        <div class="admin-content" id="github-sync-content">
+            <h3>GitHub数据同步</h3>
+            <div class="instruction-box">
+                <h4>数据同步说明</h4>
+                <p>此工具使用GitHub Pages托管数据。当您修改数据后，需要将更新后的数据文件上传到GitHub仓库才能生效。</p>
+                <ol>
+                    <li>在下方修改GitHub数据文件路径（如果您的仓库结构与默认不同）</li>
+                    <li>点击"下载数据文件"按钮，将当前数据保存为JSON文件</li>
+                    <li>将下载的JSON文件上传到您的GitHub仓库的对应路径</li>
+                    <li>等待GitHub Pages自动更新（通常需要几分钟）</li>
+                </ol>
+            </div>
+            
+            <div class="form-group">
+                <label for="github-data-path">GitHub数据文件路径</label>
+                <input type="text" id="github-data-path" value="data/nav-data.json">
+                <small>相对于GitHub Pages根目录的路径，例如: data/nav-data.json</small>
+            </div>
+            
+            <div class="github-actions">
+                <button id="download-data-btn" class="btn btn-primary">下载数据文件</button>
+                <button id="load-from-github-btn" class="btn btn-secondary">从GitHub重新加载数据</button>
+                <button id="clear-local-data-btn" class="btn btn-secondary">清除本地数据</button>
+            </div>
+            
+            <div class="instruction-box">
+                <h4>GitHub仓库设置说明</h4>
+                <ol>
+                    <li>在您的GitHub仓库中创建<code>data</code>文件夹</li>
+                    <li>将下载的<code>nav-data.json</code>文件上传到该文件夹</li>
+                    <li>确保GitHub Pages已启用（设置 → Pages → Source选择为GitHub Actions或主分支）</li>
+                    <li>数据文件将通过以下URL访问：<code id="data-url-example">https://[username].github.io/[repo]/data/nav-data.json</code></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储配置
+        const DATA_CONFIG = {
+            // GitHub Pages数据文件路径
+            dataUrl: './data/nav-data.json',
+            // 本地存储键名
+            localDataKey: 'navToolData',
+            // 使用本地存储作为备用
+            useLocalStorage: true
+        };
+
+        // 默认数据
+        const DEFAULT_DATA = {
+            pageSettings: {
+                title: "竞品信息汇总平台",
+                description: "选择合适的入口收集信息"
+            },
+            categories: [
+                {
+                    id: 1,
+                    name: "工作工具",
+                    description: "日常工作使用的工具"
+                },
+                {
+                    id: 2,
+                    name: "学习资源",
+                    description: "学习和参考资料"
+                }
+            ],
+            links: [
+                {
+                    id: 1,
+                    categoryId: 1,
+                    name: "Gmail",
+                    shortDesc: "电子邮件服务平台",
+                    description: "Google提供的免费电子邮件服务，提供15GB存储空间",
+                    url: "https://mail.google.com",
+                    icon: "✉️"
+                },
+                {
+                    id: 2,
+                    categoryId: 1,
+                    name: "Google Drive",
+                    shortDesc: "云存储和协作工具",
+                    description: "Google提供的云存储服务，支持文件同步和在线协作",
+                    url: "https://drive.google.com",
+                    icon: "📁"
+                },
+                {
+                    id: 3,
+                    categoryId: 2,
+                    name: "MDN Web Docs",
+                    shortDesc: "Web开发文档资源",
+                    description: "Mozilla提供的Web技术文档，包含HTML、CSS、JavaScript等",
+                    url: "https://developer.mozilla.org",
+                    icon: "📚"
+                },
+                {
+                    id: 4,
+                    categoryId: 2,
+                    name: "GitHub",
+                    shortDesc: "代码托管和协作平台",
+                    description: "全球最大的代码托管平台，支持Git版本控制和团队协作",
+                    url: "https://github.com",
+                    icon: "🐙"
+                }
+            ],
+            users: [
+                {
+                    id: 1,
+                    username: "admin",
+                    password: "YWRtaW4xMjM=", // admin123 的Base64编码
+                    permission: 2 // 2为高级权限
+                },
+                {
+                    id: 2,
+                    username: "user",
+                    password: "dXNlcjEyMw==", // user123 的Base64编码
+                    permission: 1 // 1为普通权限
+                }
+            ]
+        };
+
+        // 应用数据
+        let appData = { ...DEFAULT_DATA };
+
+        // 从GitHub加载数据
+        async function loadDataFromGitHub() {
+            try {
+                // 获取用户设置的GitHub数据路径
+                const dataPath = document.getElementById('github-data-path')?.value || DATA_CONFIG.dataUrl;
+                const response = await fetch(dataPath + '?t=' + Date.now());
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // 保存到本地存储作为缓存
+                    if (DATA_CONFIG.useLocalStorage) {
+                        localStorage.setItem(DATA_CONFIG.localDataKey, JSON.stringify(data));
+                    }
+                    return data;
+                } else {
+                    throw new Error(`加载数据失败: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('从GitHub加载数据失败:', error);
+                // 尝试从本地存储加载
+                if (DATA_CONFIG.useLocalStorage) {
+                    const localData = localStorage.getItem(DATA_CONFIG.localDataKey);
+                    if (localData) {
+                        return JSON.parse(localData);
+                    }
+                }
+                // 如果都失败，使用默认数据
+                return DEFAULT_DATA;
+            }
+        }
+
+        // 保存数据到本地
+        function saveDataToLocal(data) {
+            if (DATA_CONFIG.useLocalStorage) {
+                localStorage.setItem(DATA_CONFIG.localDataKey, JSON.stringify(data));
+            }
+            return true;
+        }
+
+        // 下载数据文件
+        function downloadDataFile(data) {
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            // 使用用户设置的路径中的文件名，或默认文件名
+            const dataPath = document.getElementById('github-data-path')?.value || DATA_CONFIG.dataUrl;
+            const fileName = dataPath.split('/').pop() || 'nav-data.json';
+            a.download = fileName;
+            a.click();
+            
+            // 清理URL对象
+            setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
+
+        // 显示状态消息
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status-message status-${type}`;
+            element.style.display = 'block';
+            
+            // 5秒后自动隐藏
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // 渲染主页面
+        function renderHomePage() {
+            // 更新页面标题和描述
+            const pageTitle = document.getElementById('page-title');
+            const pageDescription = document.getElementById('page-description');
+            
+            if (pageTitle) {
+                pageTitle.textContent = appData.pageSettings.title || "竞品信息汇总平台";
+            }
+            if (pageDescription) {
+                pageDescription.textContent = appData.pageSettings.description || "选择合适的入口收集信息";
+            }
+            
+            // 渲染分类和链接
+            const container = document.getElementById('categories-container');
+            container.innerHTML = '';
+            
+            appData.categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category';
+                
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.className = 'category-title';
+                categoryTitle.textContent = category.name;
+                categoryDiv.appendChild(categoryTitle);
+                
+                const tilesContainer = document.createElement('div');
+                tilesContainer.className = 'tiles-container';
+                
+                // 获取该分类下的所有链接
+                const categoryLinks = appData.links.filter(link => link.categoryId === category.id);
+                
+                categoryLinks.forEach(link => {
+                    const tile = document.createElement('div');
+                    tile.className = 'tile';
+                    tile.onclick = () => window.open(link.url, '_blank');
+                    
+                    tile.innerHTML = `
+                        <div class="tile-icon">${link.icon}</div>
+                        <h3 class="tile-title">${link.name}</h3>
+                        <p class="tile-short-desc">${link.shortDesc || ''}</p>
+                        <p class="tile-description">${link.description}</p>
+                        <div class="tile-link">点击访问 →</div>
+                    `;
+                    
+                    tilesContainer.appendChild(tile);
+                });
+                
+                categoryDiv.appendChild(tilesContainer);
+                container.appendChild(categoryDiv);
+            });
+            
+            // 隐藏加载状态，显示内容
+            document.getElementById('loading-state').style.display = 'none';
+            container.style.display = 'block';
+        }
+
+        // 登录功能
+        function setupLogin() {
+            const loginModal = document.getElementById('login-modal');
+            const loginForm = document.getElementById('login-form');
+            
+            // 监听全局快捷键 Ctrl+Shift+L
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+                    e.preventDefault();
+                    loginModal.style.display = 'flex';
+                }
+            });
+            
+            // 登录表单提交
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                // 简单加密（Base64编码）
+                const encodedPassword = btoa(password);
+                
+                // 查找用户
+                const user = appData.users.find(u => u.username === username && u.password === encodedPassword);
+                
+                if (user) {
+                    // 登录成功
+                    loginModal.style.display = 'none';
+                    document.getElementById('admin-panel').style.display = 'block';
+                    
+                    // 根据权限显示/隐藏用户管理选项卡
+                    if (user.permission === 1) {
+                        document.querySelectorAll('.admin-only').forEach(el => {
+                            el.style.display = 'none';
+                        });
+                    }
+                    
+                    // 清空表单
+                    loginForm.reset();
+                } else {
+                    showStatus('login-status', '用户名或密码错误！', 'error');
+                }
+            });
+            
+            // 点击模态框外部关闭
+            loginModal.addEventListener('click', (e) => {
+                if (e.target === loginModal) {
+                    loginModal.style.display = 'none';
+                }
+            });
+        }
+
+        // 后台管理功能
+        function setupAdminPanel() {
+            // 选项卡切换
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 移除所有active类
+                    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.admin-content').forEach(c => c.classList.remove('active'));
+                    
+                    // 添加active类
+                    tab.classList.add('active');
+                    document.getElementById(`${tab.dataset.tab}-content`).classList.add('active');
+                });
+            });
+            
+            // 退出登录
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                document.getElementById('admin-panel').style.display = 'none';
+            });
+            
+            // 初始化各个管理面板的内容
+            initLinksManagement();
+            initCategoriesManagement();
+            initPageSettings();
+            initUsersManagement();
+            initGitHubSync();
+        }
+
+        // 初始化链接管理
+        function initLinksManagement() {
+            const content = document.getElementById('links-content');
+            content.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="link-name">链接名称</label>
+                        <input type="text" id="link-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="link-url">链接地址</label>
+                        <input type="text" id="link-url" placeholder="https://example.com">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="link-category">分类</label>
+                        <select id="link-category">
+                            ${appData.categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="link-icon">图标</label>
+                        <input type="text" id="link-icon" placeholder="表情符号，如: 📧">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="link-short-desc">简短说明 (最多40字)</label>
+                        <input type="text" id="link-short-desc" maxlength="40">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="link-description">详细描述</label>
+                    <textarea id="link-description"></textarea>
+                </div>
+                <div class="form-row">
+                    <button id="add-link-btn" class="btn btn-primary">添加链接</button>
+                    <button id="update-link-btn" class="btn btn-edit" style="display: none;">更新链接</button>
+                    <button id="cancel-edit-link-btn" class="btn btn-cancel" style="display: none;">取消编辑</button>
+                </div>
+                
+                <h4 style="margin-top: 30px;">现有链接</h4>
+                <div id="links-list"></div>
+            `;
+            
+            let editingLinkId = null;
+            
+            // 添加链接
+            document.getElementById('add-link-btn').addEventListener('click', () => {
+                const name = document.getElementById('link-name').value;
+                const url = document.getElementById('link-url').value;
+                const categoryId = parseInt(document.getElementById('link-category').value);
+                const icon = document.getElementById('link-icon').value;
+                const shortDesc = document.getElementById('link-short-desc').value;
+                const description = document.getElementById('link-description').value;
+                
+                if (name && url) {
+                    const newLink = {
+                        id: Date.now(),
+                        categoryId,
+                        name,
+                        shortDesc,
+                        description,
+                        url,
+                        icon: icon || '🔗'
+                    };
+                    
+                    appData.links.push(newLink);
+                    
+                    // 保存到本地存储
+                    saveDataToLocal(appData);
+                    showStatus('admin-status', '链接添加成功！已保存到本地。请前往"GitHub同步"选项卡下载数据文件并更新GitHub。', 'success');
+                    renderHomePage();
+                    initLinksManagement(); // 重新初始化以更新列表
+                    
+                    // 清空表单
+                    clearLinkForm();
+                }
+            });
+            
+            // 更新链接
+            document.getElementById('update-link-btn').addEventListener('click', () => {
+                if (!editingLinkId) return;
+                
+                const name = document.getElementById('link-name').value;
+                const url = document.getElementById('link-url').value;
+                const categoryId = parseInt(document.getElementById('link-category').value);
+                const icon = document.getElementById('link-icon').value;
+                const shortDesc = document.getElementById('link-short-desc').value;
+                const description = document.getElementById('link-description').value;
+                
+                if (name && url) {
+                    // 找到并更新链接
+                    const linkIndex = appData.links.findIndex(link => link.id === editingLinkId);
+                    if (linkIndex !== -1) {
+                        appData.links[linkIndex] = {
+                            ...appData.links[linkIndex],
+                            name,
+                            url,
+                            categoryId,
+                            icon,
+                            shortDesc,
+                            description
+                        };
+                        
+                        // 保存到本地存储
+                        saveDataToLocal(appData);
+                        showStatus('admin-status', '链接更新成功！已保存到本地。请前往"GitHub同步"选项卡下载数据文件并更新GitHub。', 'success');
+                        renderHomePage();
+                        initLinksManagement(); // 重新初始化以更新列表
+                        
+                        // 退出编辑模式
+                        exitEditMode();
+                    }
+                }
+            });
+            
+            // 取消编辑
+            document.getElementById('cancel-edit-link-btn').addEventListener('click', () => {
+                exitEditMode();
+            });
+            
+            // 显示现有链接
+            const linksList = document.getElementById('links-list');
+            appData.links.forEach(link => {
+                const linkDiv = document.createElement('div');
+                linkDiv.className = 'form-row';
+                linkDiv.style.marginBottom = '10px';
+                linkDiv.style.padding = '10px';
+                linkDiv.style.backgroundColor = 'var(--light-gray)';
+                linkDiv.style.borderRadius = '5px';
+                
+                const category = appData.categories.find(cat => cat.id === link.categoryId);
+                
+                linkDiv.innerHTML = `
+                    <div style="flex: 1;">
+                        <strong>${link.name}</strong> (${category ? category.name : '未分类'})<br>
+                        <small>${link.shortDesc || ''}</small><br>
+                        <small>${link.description}</small>
+                    </div>
+                    <div>
+                        <button class="btn btn-edit edit-link" data-id="${link.id}">编辑</button>
+                        <button class="btn btn-secondary delete-link" data-id="${link.id}">删除</button>
+                    </div>
+                `;
+                
+                linksList.appendChild(linkDiv);
+            });
+            
+            // 编辑链接
+            document.querySelectorAll('.edit-link').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.dataset.id);
+                    const link = appData.links.find(link => link.id === id);
+                    
+                    if (link) {
+                        // 填充表单
+                        document.getElementById('link-name').value = link.name;
+                        document.getElementById('link-url').value = link.url;
+                        document.getElementById('link-category').value = link.categoryId;
+                        document.getElementById('link-icon').value = link.icon;
+                        document.getElementById('link-short-desc').value = link.shortDesc || '';
+                        document.getElementById('link-description').value = link.description;
+                        
+                        // 切换到编辑模式
+                        editingLinkId = id;
+                        document.getElementById('add-link-btn').style.display = 'none';
+                        document.getElementById('update-link-btn').style.display = 'inline-block';
+                        document.getElementById('cancel-edit-link-btn').style.display = 'inline-block';
+                    }
+                });
+            });
+            
+            // 删除链接
+            document.querySelectorAll('.delete-link').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.dataset.id);
+                    appData.links = appData.links.filter(link => link.id !== id);
+                    
+                    // 保存到本地存储
+                    saveDataToLocal(appData);
+                    showStatus('admin-status', '链接删除成功！已保存到本地。请前往"GitHub同步"选项卡下载数据文件并更新GitHub。', 'success');
+                    renderHomePage();
+                    initLinksManagement();
+                });
+            });
+            
+            // 清空链接表单
+            function clearLinkForm() {
+                document.getElementById('link-name').value = '';
+                document.getElementById('link-url').value = '';
+                document.getElementById('link-icon').value = '';
+                document.getElementById('link-short-desc').value = '';
+                document.getElementById('link-description').value = '';
+            }
+            
+            // 退出编辑模式
+            function exitEditMode() {
+                editingLinkId = null;
+                document.getElementById('add-link-btn').style.display = 'inline-block';
+                document.getElementById('update-link-btn').style.display = 'none';
+                document.getElementById('cancel-edit-link-btn').style.display = 'none';
+                clearLinkForm();
+            }
+        }
+
+        // 初始化分类管理
+        function initCategoriesManagement() {
+            const content = document.getElementById('categories-content');
+            content.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category-name">分类名称</label>
+                        <input type="text" id="category-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="category-description">分类描述</label>
+                        <input type="text" id="category-description">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <button id="add-category-btn" class="btn btn-primary">添加分类</button>
+                    <button id="update-category-btn" class="btn btn-edit" style="display: none;">更新分类</button>
+                    <button id="cancel-edit-category-btn" class="btn btn-cancel" style="display: none;">取消编辑</button>
+                </div>
+                
+                <h4 style="margin-top: 30px;">现有分类</h4>
+                <div id="categories-list"></div>
+            `;
+            
+            let editingCategoryId = null;
+            
+            // 添加分类
+            document.getElementById('add-category-btn').addEventListener('click', () => {
+                const name = document.getElementById('category-name').value;
+                const description = document.getElementById('category-description').value;
+                
+                if (name) {
+                    const newCategory = {
+                        id: Date.now(),
+                        name,
+                        description
+                    };
+                    
+                    appData.categories.push(newCategory);
+                    
+                    // 保存到本地存储
+                    saveDataToLocal(appData);
+                    showStatus('admin-status', '分类添加成功！已保存到本地。请前往"GitHub同步"选项卡下载数据文件并更新GitHub。', 'success');
+                    renderHomePage();
+                    initCategoriesManagement();
+                    initLinksManagement(); // 更新链接管理中的分类选项
+                    
+                    // 清空表单
+                    clearCategoryForm();
+                }
+            });
+            
+            // 更新分类
+            document.getElementById('update-category-btn').addEventListener('click', () => {
+                if (!editingCategoryId) return;
+                
+                const name = document.getElementById('category-name').value;
+                const description = document.getElementById('category-description').value;
+                
+                if (name) {
+                    // 找到并更新分类
+                    const categoryIndex = appData.categories.findIndex(cat => cat.id === editingCategoryId);
+                    if (categoryIndex !== -1) {
+                        appData.categories[categoryIndex] = {
+                            ...appData.categories[categoryIndex],
+                            name,
+                            description
+                        };
+                        
+                        // 保存到本地存储
+                        saveDataToLocal(appData);
+                        showStatus('admin-status', '分类更新成功！已保存到本地。请前往"GitHub同步"选项卡下载数据文件并更新GitHub。', 'success');
+                        renderHomePage();
+                        initCategoriesManagement();
+                        initLinksManagement(); // 更新链接管理中的分类选项
+                        
+                        // 退出编辑模式
+                        exitEditMode();
+                    }
+                }
+            });
+            
+            // 取消编辑
+            document.getElementById('cancel-edit-category-btn').addEventListener('click', () => {
+                exitEditMode();
+            });
+            
+            // 显示现有分类
+            const categoriesList = document.getElementById('categories-list');
+            appData.categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'form-row';
+                categoryDiv.style.marginBottom = '10px';
+                categoryDiv.style.padding = '10px';
+                categoryDiv.style.backgroundColor = 'var(--light-gray)';
+                categoryDiv.style.borderRadius = '5px';
+                
+                categoryDiv.innerHTML = `
+                    <div style="flex: 1;">
+                        <strong>${category.name}</strong><br>
+                        <small>${category.description}</small>
+                    </div>
+                    <div>
+                        <button class="btn btn-edit edit-category" data-id="${category.id}">编辑</button>
+                        <button class="btn btn-secondary delete-category" data-id="${category.id}">删除</button>
+                    </div>
+                `;
+                
+                categoriesList.appendChild(categoryDiv);
+            });
+            
+            // 编辑分类
+            document.querySelectorAll('.edit-category').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.dataset.id);
+                    const category = appData.categories.find(cat => cat.id === id);
+                    
+                    if (category) {
+                        // 填充表单
+                        document.getElementById('category-name').value = category.name;
+                        document.getElementById('category-description').value = category.description;
+                        
+                        // 切换到编辑模式
+                        editingCategoryId = id;
+                        document.getElementById('add-category-btn').style.display = 'none';
+                        document.getElementById('update-category-btn').style.display = 'inline-block';
+                        document.getElementById('cancel-edit-category-btn').style.display = 'inline-block';
+                    }
+                });
+            });
+            
+            // 删除分类
+            document.querySelectorAll('.delete-category').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.dataset.id);
+                    
+                    appData.categories = appData.categories.filter(cat => cat.id !== id);
+                    // 同时删除该分类下的所有链接
+                    appData.links = appData.links.filter(link => link.categoryId !== id);
+                    
+                    // 保存到本地存储
+                    saveDataToLocal(appData);
+                    showStatus('admin-status', '分类删除成功！已保存到本地。请前往"GitHub同步"选项卡下载数据文件并更新GitHub。', 'success');
+                    renderHomePage();
+                    initCategoriesManagement();
+                    initLinksManagement();
+                });
+            });
+            
+            // 清空分类表单
+            function clearCategoryForm() {
+                document.getElementById('category-name').value = '';
+                document.getElementById('category-description').value = '';
+            }
+            
+            // 退出编辑模式
+            function exitEditMode() {
+                editingCategoryId = null;
+                document.getElementById('add-category-btn').style.display = 'inline-block';
+                document.getElementById('update-category-btn').style.display = 'none';
+                document.getElementById('cancel-edit-category-btn').style.display = 'none';
+                clearCategoryForm();
+            }
+        }
+
+        // 初始化页面设置
+        function initPageSettings() {
+            const content = document.getElementById('page-settings-content');
+            content.innerHTML = `
+                <div class="form-group">
+                    <label for="page-title">页面标题</label>
+                    <input type="text" id="page-title" value="${appData.pageSettings.title || ''}">
+                </div>
+                <div class="form-group">
+                    <label for="page-description">页面描述</label>
+                    <input type="text" id="page-description" value="${appData.pageSettings.description || ''}">
+                </div>
+                <button id="save-page-settings" class="btn btn-primary">保存设置</button>
+            `;
+            
+            document.getElementById('save-page-settings').addEventListener('click', () => {
+                appData.pageSettings.title = document.getElementById('page-title').value;
+                appData.pageSettings.description = document.getElementById('page-description').value;
+                
+                // 保存到本地存储
+                saveDataToLocal(appData);
+                showStatus('admin-status', '页面设置保存成功！已保存到本地。请前往"GitHub同步"选项卡下载数据文件并更新GitHub。', 'success');
+                renderHomePage();
+            });
+        }
+
+        // 初始化用户管理
+        function initUsersManagement() {
+            const content = document.getElementById('users-content');
+            content.innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="user-username">用户名</label>
+                        <input type="text" id="user-username">
+                    </div>
+                    <div class="form-group">
+                        <label for="user-password">密码</label>
+                        <input type="password" id="user-password">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="user-permission">权限级别</label>
+                    <select id="user-permission">
+                        <option value="1">普通管理员</option>
+                        <option value="2">高级管理员</option>
+                    </select>
+                </div>
+                <button id="add-user-btn" class="btn btn-primary">添加用户</button>
+                
+                <h4 style="margin-top: 30px;">现有用户</h4>
+                <div id="users-list"></div>
+            `;
+            
+            // 添加用户
+            document.getElementById('add-user-btn').addEventListener('click', () => {
+                const username = document.getElementById('user-username').value;
+                const password = document.getElementById('user-password').value;
+                const permission = parseInt(document.getElementById('user-permission').value);
+                
+                if (username && password) {
+                    const newUser = {
+                        id: Date.now(),
+                        username,
+                        password: btoa(password), // Base64编码
+                        permission
+                    };
+                    
+                    appData.users.push(newUser);
+                    
+                    // 保存到本地存储
+                    saveDataToLocal(appData);
+                    showStatus('admin-status', '用户添加成功！已保存到本地。请前往"GitHub同步"选项卡下载数据文件并更新GitHub。', 'success');
+                    initUsersManagement();
+                    
+                    // 清空表单
+                    document.getElementById('user-username').value = '';
+                    document.getElementById('user-password').value = '';
+                }
+            });
+            
+            // 显示现有用户
+            const usersList = document.getElementById('users-list');
+            appData.users.forEach(user => {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'form-row';
+                userDiv.style.marginBottom = '10px';
+                userDiv.style.padding = '10px';
+                userDiv.style.backgroundColor = 'var(--light-gray)';
+                userDiv.style.borderRadius = '5px';
+                
+                userDiv.innerHTML = `
+                    <div style="flex: 1;">
+                        <strong>${user.username}</strong> (${user.permission === 2 ? '高级管理员' : '普通管理员'})
+                    </div>
+                    <div>
+                        <button class="btn btn-secondary delete-user" data-id="${user.id}">删除</button>
+                    </div>
+                `;
+                
+                usersList.appendChild(userDiv);
+            });
+            
+            // 删除用户
+            document.querySelectorAll('.delete-user').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = parseInt(btn.dataset.id);
+                    appData.users = appData.users.filter(user => user.id !== id);
+                    
+                    // 保存到本地存储
+                    saveDataToLocal(appData);
+                    showStatus('admin-status', '用户删除成功！已保存到本地。请前往"GitHub同步"选项卡下载数据文件并更新GitHub。', 'success');
+                    initUsersManagement();
+                });
+            });
+        }
+
+        // 初始化GitHub同步功能
+        function initGitHubSync() {
+            const content = document.getElementById('github-sync-content');
+            
+            // 更新数据URL示例
+            updateDataUrlExample();
+            
+            // 下载数据文件
+            document.getElementById('download-data-btn').addEventListener('click', () => {
+                downloadDataFile(appData);
+                showStatus('admin-status', '数据文件已下载。请将此文件上传到您的GitHub仓库。', 'success');
+            });
+            
+            // 从GitHub重新加载数据
+            document.getElementById('load-from-github-btn').addEventListener('click', async () => {
+                try {
+                    document.getElementById('loading-state').style.display = 'block';
+                    document.getElementById('categories-container').style.display = 'none';
+                    
+                    appData = await loadDataFromGitHub();
+                    renderHomePage();
+                    showStatus('admin-status', '数据已从GitHub重新加载！', 'success');
+                    
+                    // 重新初始化所有管理面板
+                    initLinksManagement();
+                    initCategoriesManagement();
+                    initPageSettings();
+                    initUsersManagement();
+                } catch (error) {
+                    showStatus('admin-status', `重新加载数据失败: ${error.message}`, 'error');
+                }
+            });
+            
+            // 清除本地数据
+            document.getElementById('clear-local-data-btn').addEventListener('click', () => {
+                if (confirm('确定要清除本地数据吗？这将删除所有本地修改，恢复为GitHub上的数据。')) {
+                    localStorage.removeItem(DATA_CONFIG.localDataKey);
+                    showStatus('admin-status', '本地数据已清除。页面将重新加载。', 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                }
+            });
+            
+            // 当GitHub数据路径改变时更新示例
+            document.getElementById('github-data-path').addEventListener('change', updateDataUrlExample);
+        }
+        
+        // 更新数据URL示例
+        function updateDataUrlExample() {
+            const dataPath = document.getElementById('github-data-path').value;
+            // 假设GitHub Pages URL为 https://[username].github.io/[repo]/
+            const exampleUrl = `https://[username].github.io/[repo]/${dataPath}`;
+            document.getElementById('data-url-example').textContent = exampleUrl;
+        }
+
+        // 初始化应用
+        async function initApp() {
+            try {
+                appData = await loadDataFromGitHub();
+                renderHomePage();
+                setupLogin();
+                setupAdminPanel();
+            } catch (error) {
+                console.error('初始化应用失败:', error);
+                document.getElementById('loading-state').innerHTML = `
+                    <div style="color: #e74c3c;">
+                        <p>加载数据失败: ${error.message}</p>
+                        <p>使用默认数据...</p>
+                    </div>
+                `;
+                // 使用默认数据
+                renderHomePage();
+                setupLogin();
+                setupAdminPanel();
+            }
+        }
+
+        // 当页面加载完成后初始化应用
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
