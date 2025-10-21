@@ -1,0 +1,56 @@
+{
+  "pageSettings": {},
+  "categories": [
+    {
+      "id": 1760592801771,
+      "name": "竞品采集模块",
+      "description": ""
+    }
+  ],
+  "links": [
+    {
+      "id": 1760593193538,
+      "categoryId": 1760592801771,
+      "name": "竞品信息录入",
+      "description": "",
+      "url": "https://q02gj5lyidv.feishu.cn/share/base/form/shrcn8NtbZyN8G8IazSO1FTCbWh",
+      "icon": "🪴",
+      "shortDesc": "收集竞品基本信息，必填型号、品牌、关键信息提炼"
+    },
+    {
+      "id": 1760593260447,
+      "categoryId": 1760592801771,
+      "name": "市场信息采集",
+      "description": "",
+      "url": "https://q02gj5lyidv.feishu.cn/share/base/form/shrcnwBtXoH5P4fpesdG1Bx2Mie",
+      "icon": "🗞️",
+      "shortDesc": "为已经录入的竞品添加价格、客户反馈等信息"
+    },
+    {
+      "id": 1761011155912,
+      "categoryId": 1760592801771,
+      "name": "调研报告汇总",
+      "shortDesc": "快速登记调研报告的入口",
+      "description": "",
+      "url": "https://q02gj5lyidv.feishu.cn/share/base/form/shrcnPrMwcNTO6LaSjob1RWP8eb",
+      "icon": "📘"
+    },
+    {
+      "id": 1761011937157,
+      "categoryId": 1760592801771,
+      "name": "入库信息查询",
+      "shortDesc": "【权限】搜索整理好的竞品信息",
+      "description": "",
+      "url": "https://q02gj5lyidv.feishu.cn/share/base/query/shrcndqU5S2TFqzdfSrpwvG32uf",
+      "icon": "🔎"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "YWRtaW4xMjM=",
+      "permission": 2
+    }
+  ]
+}
